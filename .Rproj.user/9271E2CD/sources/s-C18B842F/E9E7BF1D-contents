@@ -1,0 +1,174 @@
+---
+title: "Recreate Table A-1. Employment status of the civilian population by sex and age"
+output: html_notebook
+---
+
+#Bureau of Labor Statistics: Table A-1.. Employment status of the civilian population by sex and age
+*by ALEXANDER HENOUMONT*
+
+
+##Introduction
+This project will recreate the Bureau of Labor Statistics July 2018 report of the Employment data Using the Current Population Survey found [here] (https://www.bls.gov/news.release/empsit.t01.htm)
+
+
+Data was obtained from the Data Ferret Application and pulled on 1 Sep 2018.
+
+The variables of interest are PESEX, PESEX, PEMLR, PRPERTYP, PRWNTJO
+
+Explanation of variables
+  HRHHID: Household Identifier. Each observation is an individual and this variable is a decribes all individuals in a given household.
+  **HRHHID2**: Household Identifier
+  **OCCURNUM**: Unique person identifier.
+  **YYYYMM**: Year and month observation was taken
+  **PESEX**: Gender
+    1 = Male
+    2 = Female
+  **PRTAGE**:
+    Age
+    80 = 80-84
+    85 = 85+
+  **PEMLR**:Employment type
+    1	EMPLOYED-AT WORK
+    2	EMPLOYED-ABSENT
+    3	UNEMPLOYED-ON LAYOFF
+    4	UNEMPLOYED-LOOKING
+    5	NOT IN LABOR FORCE-RETIRED
+    6	NOT IN LABOR FORCE-DISABLED
+    7	NOT IN LABOR FORCE-OTHER
+  **PRPERTYP**: Person Type
+    1	CHILD HOUSEHOLD MEMBER
+    2	ADULT CIVILIAN HOUSEHOLD MEMBER
+    3	ADULT ARMED FORCES HOUSEHOLD MEMBER
+  **PRWNTJOB**
+    1 YES
+    2 NO
+    
+    
+```{r message = FALSE}
+#load libraries
+library(tidyverse)
+
+```
+
+##Import Data
+  Since there is only an availavle API for the poverty data on the CPS, the data had to be pulled manually from the [Data Farret] (thedataweb.census.gov) application. The following variables were queried on 1 Sept 2018 from *July 2017, March, April, May, June* and *July 2018* tables: *PESEX, PESEX, PEMLR, PRPERTYP, PRWNTJOB*. 
+```{r message=FALSE}
+
+temp <-  list.files(pattern="*.csv")
+cpsData = as_data_frame(lapply(temp, read_csv) %>% bind_rows())
+
+```
+
+**************************************************
+##Creating the Tables##
+Using *dplyr* package in R, the tables could be created with a single command. The tables consists of 10 variables, 6 variables that have to be queried and the other 3 were merely ratios of the previous 6.
+
+#Table A-1. Employment status of the civilian population by sex and age
+
+#TOTAL
+```{r}
+tableA_total <- cpsData %>% 
+  group_by(YYYYMM) %>% 
+  summarize(`Civilian population` = n(),
+            `Civilian labor force` = sum(PRPERTYP == 2),
+            Employed = sum(PEMLR == 1 | PEMLR == 2),
+            Unemployed = sum(PEMLR == 3 | PEMLR == 4),
+            `Not in labor force` = sum(PEMLR == 5 | PEMLR == 6),
+            `Person wants job` = sum(PRWNTJOB == 1)) %>% 
+  mutate(`Participation rate` = `Civilian labor force` / `Civilian population` * 100,
+         `Employment-population ratio` = Employed / `Civilian population` * 100,
+         `Unemployment rate` = Unemployed / `Civilian population` * 100) %>% 
+  ungroup()
+```
+
+```{r}
+tableA_total %>% 
+  filter(PESEX)
+```
+
+##MEN, 16 AND OVER
+```{r}
+tableA_maleOver16 <- cpsData %>%
+  filter(PESEX == 1, PRTAGE >= 16) %>% 
+  group_by(YYYYMM) %>% 
+  summarize(`Civilian population` = n(),
+            `Civilian labor force` = sum(PRPERTYP == 2),
+            Employed = sum(PEMLR == 1 | PEMLR == 2),
+            Unemployed = sum(PEMLR == 3 | PEMLR == 4),
+            `Not in labor force` = sum(PEMLR == 5 | PEMLR == 6),
+            `Person wants job` = sum(PRWNTJOB == 1)) %>% 
+  mutate(`Participation rate` = `Civilian labor force` / `Civilian population` * 100,
+         `Employment-population ratio` = Employed / `Civilian population` * 100,
+         `Unemployment rate` = Unemployed / `Civilian population` * 100) %>% 
+  ungroup()
+```
+
+##MEN, 20 AND OVER
+```{r}
+tableA_maleOver20 <- cpsData %>%
+  filter(PESEX == 1, PRTAGE >= 20) %>% 
+  group_by(YYYYMM) %>% 
+  summarize(`Civilian population` = n(),
+            `Civilian labor force` = sum(PRPERTYP == 2),
+            Employed = sum(PEMLR == 1 | PEMLR == 2),
+            Unemployed = sum(PEMLR == 3 | PEMLR == 4),
+            `Not in labor force` = sum(PEMLR == 5 | PEMLR == 6),
+            `Person wants job` = sum(PRWNTJOB == 1)) %>% 
+  mutate(`Participation rate` = `Civilian labor force` / `Civilian population` * 100,
+         `Employment-population ratio` = Employed / `Civilian population` * 100,
+         `Unemployment rate` = Unemployed / `Civilian population` * 100) %>% 
+  ungroup()
+```
+
+##WOMEN, 16 AND OVER
+```{r}
+tableA_femaleOver16 <- cpsData %>%
+  filter(PESEX == 2, PRTAGE >= 16) %>% 
+  group_by(YYYYMM) %>% 
+  summarize(`Civilian population` = n(),
+            `Civilian labor force` = sum(PRPERTYP == 2),
+            Employed = sum(PEMLR == 1 | PEMLR == 2),
+            Unemployed = sum(PEMLR == 3 | PEMLR == 4),
+            `Not in labor force` = sum(PEMLR == 5 | PEMLR == 6),
+            `Person wants job` = sum(PRWNTJOB == 1)) %>% 
+  mutate(`Participation rate` = `Civilian labor force` / `Civilian population` * 100,
+         `Employment-population ratio` = Employed / `Civilian population` * 100,
+         `Unemployment rate` = Unemployed / `Civilian population` * 100) %>% 
+  ungroup()
+```
+
+#WOMEN, 20 AND OVER
+```{r}
+tableA_femaleOver20 <- cpsData %>%
+  filter(PESEX == 2, PRTAGE >= 20) %>% 
+  group_by(YYYYMM) %>% 
+  summarize(`Civilian population` = n(),
+            `Civilian labor force` = sum(PRPERTYP == 2),
+            Employed = sum(PEMLR == 1 | PEMLR == 2),
+            Unemployed = sum(PEMLR == 3 | PEMLR == 4),
+            `Not in labor force` = sum(PEMLR == 5 | PEMLR == 6),
+            `Person wants job` = sum(PRWNTJOB == 1)) %>% 
+  mutate(`Participation rate` = `Civilian labor force` / `Civilian population` * 100,
+         `Employment-population ratio` = Employed / `Civilian population` * 100,
+         `Unemployment rate` = Unemployed / `Civilian population` * 100) %>% 
+  ungroup()
+```
+
+##BOTH SEXES BETWEEN 16 AND 19
+```{r}
+tableA_femaleOver20 <- cpsData %>%
+  filter(PRTAGE >= 16, PRTAGE <= 19) %>% 
+  group_by(YYYYMM) %>% 
+  summarize(`Civilian population` = n(),
+            `Civilian labor force` = sum(PRPERTYP == 2),
+            Employed = sum(PEMLR == 1 | PEMLR == 2),
+            Unemployed = sum(PEMLR == 3 | PEMLR == 4),
+            `Not in labor force` = sum(PEMLR == 5 | PEMLR == 6),
+            `Person wants job` = sum(PRWNTJOB == 1)) %>% 
+  mutate(`Participation rate` = `Civilian labor force` / `Civilian population` * 100,
+         `Employment-population ratio` = Employed / `Civilian population` * 100,
+         `Unemployment rate` = Unemployed / `Civilian population` * 100) %>% 
+  ungroup()
+```
+
+

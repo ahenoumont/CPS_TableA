@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1535934647073.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E7B52DBD",
+    "lastKnownWriteTime" : 1535932004,
+    "last_content_update" : 1535932004,
+    "path" : "~/Documents/Data Science/CPS_TableA/workingTableA1.R",
+    "project_path" : "workingTableA1.R",
+    "properties" : {
+        "cursorPosition" : "122,6",
+        "scrollLine" : "98",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,7 @@
+"0","getwd()"
+"1","[1]"
+"1"," ""/Users/MacUser/Documents/Data Science/CPS_TableA"""
+"1","
+"
+"0","temp <-  list.files(pattern=""*.csv"")"
+"0","cprData = as_data_frame(lapply(temp, read_csv) %>% bind_rows())"
